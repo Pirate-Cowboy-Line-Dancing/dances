@@ -1,94 +1,114 @@
 
-// nav.js — DOM-built nav (no HTML strings, no filename leaks)
+// nav.js — responsive nav with mobile drawer and no word-per-line title
 (function () {
-
   const LOGO_SRC = "Pirate_Cowboy_Transparent_Circle.png";
   const LOGO_SIZE = 50;
 
-  // Create nav container
+  // Create <nav>
   const nav = document.createElement("nav");
   nav.setAttribute("aria-label", "Primary");
-  nav.style.fontSize = "1.2rem";
+  nav.className = "pcld-nav"; // use class styling instead of inline
 
   const wrap = document.createElement("div");
-  wrap.className = "wrap";
-  wrap.style.display = "flex";
-  wrap.style.alignItems = "center";
-  wrap.style.justifyContent = "space-between";
-  wrap.style.gap = "1rem";
-  wrap.style.paddingTop = ".5rem";
-  wrap.style.paddingBottom = ".5rem";
+  wrap.className = "pcld-nav__wrap";
 
-  // ----- LEFT: Logo + Name -----
+  // -------- LEFT (logo + brand) --------
   const left = document.createElement("div");
-  left.style.display = "flex";
-  left.style.alignItems = "center";
-  left.style.gap = ".75rem";
+  left.className = "pcld-nav__left";
 
   const homeLink = document.createElement("a");
   homeLink.href = "index.html";
-  homeLink.style.display = "flex";
-  homeLink.style.alignItems = "center";
-  homeLink.style.gap = ".75rem";
+  homeLink.className = "pcld-nav__home";
 
   const logo = document.createElement("img");
   logo.src = LOGO_SRC;
   logo.alt = "Pirate Cowboy Line Dancing";
   logo.width = LOGO_SIZE;
   logo.height = LOGO_SIZE;
-  logo.style.borderRadius = "50%";
-
+  logo.className = "pcld-nav__logo";
   homeLink.appendChild(logo);
 
   const brand = document.createElement("span");
-  brand.className = "muted";
+  brand.className = "pcld-nav__brand muted";
   brand.textContent = "Pirate Cowboy Line Dancing";
-  brand.style.fontWeight = "1200";
-  //brand.style.opacity = "1";
+  left.appendChild(homeLink);
+  left.appendChild(brand);
 
-  left.appendChild(homeLink); // link
-  left.appendChild(brand);    // text only
-//  homeLink.appendChild(brand);
-//  left.appendChild(homeLink);
-
-  // ----- RIGHT: Nav links -----
+  // -------- RIGHT (links) --------
   const right = document.createElement("div");
-  right.style.display = "flex";
-  right.style.gap = "1rem";
-  right.style.alignItems = "center";
+  right.className = "pcld-nav__right";
 
   const links = [
     { text: "Home", href: "index.html" },
     { text: "About", href: "about.html" },
     { text: "Locations", href: "locations.html" }
   ];
-
   const current = location.pathname.split("/").pop() || "index.html";
+
+  // The visible inline links (desktop)
+  const linkRow = document.createElement("div");
+  linkRow.className = "pcld-nav__links";
+  links.forEach(({ text, href }) => {
+    const a = document.createElement("a");
+    a.href = href;
+    a.textContent = text;
+    if (href === current) {
+      a.classList.add("is-active");
+    }
+    linkRow.appendChild(a);
+  });
+
+  // Mobile toggle + drawer
+  const menuBtn = document.createElement("button");
+  menuBtn.className = "pcld-nav__toggle";
+  menuBtn.setAttribute("type", "button");
+  menuBtn.setAttribute("aria-label", "Menu");
+  menuBtn.setAttribute("aria-expanded", "false");
+  menuBtn.innerHTML = `<span class="pcld-nav__burger" aria-hidden="true"></span>`;
+
+  const panel = document.createElement("div");
+  panel.className = "pcld-nav__panel";
+  panel.setAttribute("aria-hidden", "true");
+
+  const panelList = document.createElement("nav");
+  panelList.className = "pcld-nav__panel-list";
+  panelList.setAttribute("aria-label", "Mobile");
 
   links.forEach(({ text, href }) => {
     const a = document.createElement("a");
     a.href = href;
     a.textContent = text;
+    if (href === current) a.classList.add("is-active");
+    panelList.appendChild(a);
+  });
+  panel.appendChild(panelList);
 
-    if (href === current) {
-      a.style.color = "var(--accent)";
-      a.style.fontWeight = "700";
-      a.style.textDecoration = "underline";
-    }
+  // Toggle behavior
+  function toggleMenu(force) {
+    const open = force ?? !panel.classList.contains("is-open");
+    panel.classList.toggle("is-open", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+    panel.setAttribute("aria-hidden", String(!open));
+    document.documentElement.classList.toggle("pcld-no-scroll", open);
+    document.body.classList.toggle("pcld-no-scroll", open);
+  }
+  menuBtn.addEventListener("click", () => toggleMenu());
 
-    right.appendChild(a);
+  // Close on route change / link click
+  panel.addEventListener("click", (e) => {
+    const t = e.target;
+    if (t && t.tagName === "A") toggleMenu(false);
   });
 
+  right.appendChild(linkRow);
+  right.appendChild(menuBtn);
+  nav.appendChild(wrap);
   wrap.appendChild(left);
   wrap.appendChild(right);
-  nav.appendChild(wrap);
+  document.body.appendChild(panel); // panel as a sibling overlay
 
   // Insert nav above header
   const header = document.querySelector("header");
-  if (header) {
-    header.before(nav);
-  } else {
-    document.body.prepend(nav);
-  }
-
+  if (header) header.before(nav);
+  else document.body.prepend(nav);
 })();
