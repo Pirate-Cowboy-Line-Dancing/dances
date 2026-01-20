@@ -1,0 +1,69 @@
+/* /dances/test/nav-hotfix.css — mobile-only overrides; desktop unaffected */
+@media (max-width: 640px) {
+
+  /* Brand: keep on one line and shrink if needed */
+  nav.pcld-nav .pcld-nav__brand,
+  nav .pcld-nav__brand,
+  nav .muted {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: inline-block !important;
+    max-width: 72vw !important;
+    font-size: clamp(16px, 4.6vw, 20px) !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Hide inline links on mobile; use the drawer instead */
+  nav.pcld-nav .pcld-nav__links,
+  nav .pcld-nav__links {
+    display: none !important;
+  }
+
+  /* Drawer panel: HIDDEN by default; JS adds .is-open when toggled */
+  .pcld-nav__panel {
+    position: fixed !important;
+    left: 0; right: 0;
+    top: 56px;                       /* adjust if your header is taller */
+    max-height: calc(100dvh - 56px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    background: var(--card, #111720) !important;
+    border-top: 1px solid #1f2a3c !important;
+    z-index: 999 !important;
+
+    /* Closed state (default) */
+    transform: translateY(-105%) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+
+    transition: transform 180ms ease, opacity 120ms ease !important;
+  }
+
+  /* OPEN state — only when nav.js adds .is-open */
+  .pcld-nav__panel.is-open {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Vertical list */
+  .pcld-nav__panel-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: .25rem !important;
+    padding: .6rem .75rem .9rem !important;
+  }
+
+  /* Links: allow wrapping so “Locations” fits, ensure large tap targets */
+  .pcld-nav__panel-list a {
+    white-space: normal !important;
+    word-break: keep-all !important;
+    padding: .8rem .9rem !important;
+    border-radius: .55rem !important;
+    background: #0f1722 !important;
+    border: 1px solid #1f2a3c !important;
+    color: var(--ink, #e9f1ff) !important;
+    text-decoration: none !important;
+  }
+}

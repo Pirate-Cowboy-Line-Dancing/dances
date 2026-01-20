@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Locations | Pirate Cowboy Line Dancing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    /* ---- Site theme (same palette as index.html) ---- */
+    :root{
+      --bg:#0b0f14; --card:#111720; --ink:#e9f1ff; --ink-dim:#b7c5dd;
+      --accent:#2dd4bf; --accent-2:#f59e0b; --danger:#ef4444;
+    }
+    html,body{
+      background:var(--bg); color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      line-height:1.4; margin:0;
+    }
+    /* Prevent layout shift (keeps nav text stable across pages) */
+    html { overflow-y: scroll; }
+
+    a{color:var(--accent)}
+    header{
+      padding:clamp(16px,3vw,28px);
+      border-bottom:1px solid #152033;
+      background:linear-gradient(180deg,#0b0f14 0%,#0c121a 100%);
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:clamp(12px,3vw,24px)}
+    .header-row{display:flex;gap:16px;align-items:center}
+    h1{margin:.1rem 0 .25rem;font-weight:800;letter-spacing:.2px}
+    .sub{color:var(--ink-dim);font-size:.95rem;margin-top:.2rem}
+
+    .panel{
+      background:var(--card);
+      border:1px solid #1f2a3c;
+      border-radius:.75rem;
+      padding:1rem;
+      margin-top:1rem;
+    }
+    .note{color:var(--ink-dim);font-size:.9rem}
+    .muted{color:var(--ink-dim)}
+    footer{padding:2rem 0;color:#8ea6c4}
+
+    /* ---- Locations page layout (local styles) ---- */
+    .location {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .location-logo {
+      width: 110px;              /* adjust as preferred (90–140) */
+      height: 110px;
+      object-fit: contain;
+      border-radius: .5rem;      /* set to 50% for circle */
+      background: #0c121a;
+      border: 1px solid #1f2a3c;
+      flex-shrink: 0;
+    }
+    .location-details h2 {
+      margin: 0 0 .25rem;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .location-details p {
+      margin: .2rem 0;
+    }
+
+    @media (max-width: 600px) {
+      .location {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+    }
+
+/* ===== PCLD Nav (mobile-first, safe overrides) ===== */
+.pcld-nav {
+  font-size: 1.05rem;
+  border-bottom: 1px solid #152033;
+  background: linear-gradient(180deg, #0b0f14 0%, #0c121a 100%);
+}
+.pcld-nav__wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(10px, 2.6vw, 16px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+.pcld-nav__left {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-width: 0; /* allow brand ellipsis */
+}
+.pcld-nav__home {
+  display: flex; align-items: center;
+}
+.pcld-nav__logo {
+  border-radius: 50%;
+  display: block;
+}
+.pcld-nav__brand {
+  font-weight: 800;
+  white-space: nowrap;         /* ✅ keep title on one line */
+  overflow: hidden;
+  text-overflow: ellipsis;     /* show … on very small screens */
+  max-width: min(72vw, 640px); /* don’t push nav off screen */
+}
+
+/* Right side */
+.pcld-nav__right {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.pcld-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.pcld-nav__links a {
+  color: var(--ink);
+  text-decoration: none;
+  padding: .45rem .6rem;
+  border-radius: .45rem;
+}
+.pcld-nav__links a:hover { background: #141e2c; }
+.pcld-nav__links a.is-active {
+  color: var(--accent);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+/* Mobile toggle (hidden on desktop) */
+.pcld-nav__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px; height: 40px;
+  border: 1px solid #2a3950;
+  border-radius: .5rem;
+  background: #0f1722;
+  color: var(--ink);
+  cursor: pointer;
+}
+.pcld-nav__toggle:focus { outline: 3px solid #0e1c2f; }
+.pcld-nav__burger,
+.pcld-nav__burger::before,
+.pcld-nav__burger::after {
+  display: block;
+  width: 18px; height: 2px; background: currentColor; border-radius: 2px; position: relative;
+}
+.pcld-nav__burger::before, .pcld-nav__burger::after {
+  content: ""; position: absolute; left: 0;
+}
+.pcld-nav__burger::before { top: -6px; }
+.pcld-nav__burger::after  { top:  6px; }
+
+/* Off-canvas panel */
+.pcld-nav__panel {
+  position: fixed;
+  left: 0; right: 0; top: var(--pcld-top, 56px);
+  max-height: calc(100dvh - var(--pcld-top, 56px));
+  background: var(--card);
+  border-top: 1px solid #1f2a3c;
+  transform: translateY(-105%);
+  transition: transform 180ms ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 999;
+}
+.pcld-nav__panel.is-open { transform: translateY(0); }
+.pcld-nav__panel-list {
+  display: flex; flex-direction: column; gap: .25rem;
+  padding: .6rem .75rem .9rem;
+}
+.pcld-nav__panel-list a {
+  color: var(--ink);
+  text-decoration: none;
+  padding: .8rem .9rem;
+  border-radius: .55rem;
+  border: 1px solid #1f2a3c;
+  background: #0f1722;
+}
+.pcld-nav__panel-list a.is-active {
+  color: var(--accent);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+/* Prevent body scroll when panel is open */
+html.pcld-no-scroll, body.pcld-no-scroll { overflow: hidden; height: 100%; }
+
+/* --------- Responsive breakpoints --------- */
+@media (max-width: 640px) {
+  /* Make brand a bit smaller so it never wraps */
+  .pcld-nav__brand { font-size: clamp(16px, 4.6vw, 20px); }
+
+  /* Hide inline links on mobile; use the toggle + drawer instead */
+  .pcld-nav__links { display: none; }
+
+  /* Show menu button */
+  .pcld-nav__toggle { display: inline-flex; }
+}
+
+@media (min-width: 641px) {
+  .pcld-nav__toggle { display: none; } /* desktop: hide button */
+  .pcld-nav__panel  { display: none; } /* desktop: no drawer */
+}
+
+
+  </style>
+  <link rel="stylesheet" href="nav-mobile.css?v=7">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+
+  <!-- Header (matches index/about) -->
+  <header>
+    <div class="wrap">
+      <div class="header-row">
+        <div>
+          <h1>Locations</h1>
+          <!--
+          <div class="sub">Where we teach & dance</div>
+          -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="wrap">
+
+    <!-- ===== The Foundry at Judson Mill ===== -->
+    <section class="panel">
+      <div class="location">
+        <img
+          src="foundry-logo.png"
+          class="location-logo"
+          alt="The Foundry at Judson Mill logo"
+          width="110" height="110"
+          loading="lazy"
+        />
+        <div class="location-details">
+          <h2><a href="https://www.foundrygvl.com/" target="_blank" rel="noopener">The Foundry at Judson Mill</a></h2>
+          <p class="muted">
+            701 Easley Bridge Rd, Unit 6030<br />
+            Greenville, SC 29611
+          </p>
+
+          <p>
+            <br /><strong>Wednesdays:</strong> 6:30 PM – 12:00 AM
+          </p>
+          <p class="muted">
+            DJ PCLD - Dancer's Night Out - Lessons <strong>8:30 PM</strong><br />
+            Ladies <strong>FREE</strong>, Men 21+ $5, Men Under 21 $10
+          </p>
+
+          <p>
+            <br /><strong>Saturdays:</strong> 7:00 PM – 1:00 AM
+          </p>
+          <p class="muted">
+            DJ PCLD - Dancer's Night Out – No Lessons<br />
+            21+ $5, Under 21 $10
+          </p>
+
+          <p class="note">
+            <br />Note: Please review The Foundry’s concert event schedule prior to planning dance activities.
+          </p>
+
+          <!--
+          <p class="note">
+            Lessons start <strong>8:30 PM</strong>.
+          </p>
+          -->
+
+          <!-- Optional: add a map link (uncomment and add place link)
+          <p>
+            https://maps.google.com/?q=The+Foundry+at+Judson+MillView on Google Maps</a>
+          </p>
+          -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Wendell’s ===== -->
+    <section class="panel">
+      <div class="location">
+        <img
+          src="wendells-logo.png"
+          class="location-logo"
+          alt="Wendell’s logo"
+          width="110" height="110"
+          loading="lazy"
+        />
+        <div class="location-details">
+          <h2><a href="https://wendellssc.com/" target="_blank" rel="noopener">Wendell’s</a></h2>
+          <p class="muted">
+            5132 US‑29<br />
+            Anderson, SC 29626
+          </p>
+
+          <p>
+            <br /><strong>Fridays:</strong> 6:30 PM – 2:00 AM
+          </p>
+          <p class="muted">
+            DJ PCLD - Dancer's Night Out - Lessons <strong>8:30 PM</strong><br />
+            Ladies $6, Men 21+ $6, Men Under 21 $10
+          </p>
+          <p class="note">
+            <br />Note: Please review Wendell’s concert event schedule prior to planning dance activities.
+          </p>
+
+          <!-- Optional: map link
+          <p>
+            https://maps.google.com/?q=Wendell%27s+Anderson+SCView on Google Maps</a>
+          </p>
+          -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="wrap">
+    <small>© 2026 by Pirate Cowboy Line Dancing. All rights reserved.</small>
+  </footer>
+
+  <!-- Global nav (logo + links) -->
+  <script src="nav.js?v=4"></script>
+</body>
+</html>

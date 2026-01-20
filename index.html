@@ -12,7 +12,20 @@
     --bg:#0b0f14; --card:#111720; --ink:#e9f1ff; --ink-dim:#b7c5dd;
     --accent:#2dd4bf; --accent-2:#f59e0b; --danger:#ef4444;
   }
-  html,body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;line-height:1.4;margin:0}
+
+  html,body {
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    line-height:1.4;
+    margin:0;
+  }
+  
+
+  html {
+    overflow-y: scroll;
+  }
+
   a{color:var(--accent)}
   header{padding:clamp(16px,3vw,28px);border-bottom:1px solid #152033;background:linear-gradient(180deg,#0b0f14 0%,#0c121a 100%)}
   .wrap{max-width:1100px;margin:0 auto;padding:clamp(12px,3vw,24px)}
@@ -62,15 +75,155 @@
     table{min-width:640px}
     .logo{width:70px;height:70px}
   }
+
+/* ===== PCLD Nav (mobile-first, safe overrides) ===== */
+.pcld-nav {
+  font-size: 1.05rem;
+  border-bottom: 1px solid #152033;
+  background: linear-gradient(180deg, #0b0f14 0%, #0c121a 100%);
+}
+.pcld-nav__wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(10px, 2.6vw, 16px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+.pcld-nav__left {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-width: 0; /* allow brand ellipsis */
+}
+.pcld-nav__home {
+  display: flex; align-items: center;
+}
+.pcld-nav__logo {
+  border-radius: 50%;
+  display: block;
+}
+.pcld-nav__brand {
+  font-weight: 800;
+  white-space: nowrap;         /* ✅ keep title on one line */
+  overflow: hidden;
+  text-overflow: ellipsis;     /* show … on very small screens */
+  max-width: min(72vw, 640px); /* don’t push nav off screen */
+}
+
+/* Right side */
+.pcld-nav__right {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.pcld-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.pcld-nav__links a {
+  color: var(--ink);
+  text-decoration: none;
+  padding: .45rem .6rem;
+  border-radius: .45rem;
+}
+.pcld-nav__links a:hover { background: #141e2c; }
+.pcld-nav__links a.is-active {
+  color: var(--accent);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+/* Mobile toggle (hidden on desktop) */
+.pcld-nav__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px; height: 40px;
+  border: 1px solid #2a3950;
+  border-radius: .5rem;
+  background: #0f1722;
+  color: var(--ink);
+  cursor: pointer;
+}
+.pcld-nav__toggle:focus { outline: 3px solid #0e1c2f; }
+.pcld-nav__burger,
+.pcld-nav__burger::before,
+.pcld-nav__burger::after {
+  display: block;
+  width: 18px; height: 2px; background: currentColor; border-radius: 2px; position: relative;
+}
+.pcld-nav__burger::before, .pcld-nav__burger::after {
+  content: ""; position: absolute; left: 0;
+}
+.pcld-nav__burger::before { top: -6px; }
+.pcld-nav__burger::after  { top:  6px; }
+
+/* Off-canvas panel */
+.pcld-nav__panel {
+  position: fixed;
+  left: 0; right: 0; top: var(--pcld-top, 56px);
+  max-height: calc(100dvh - var(--pcld-top, 56px));
+  background: var(--card);
+  border-top: 1px solid #1f2a3c;
+  transform: translateY(-105%);
+  transition: transform 180ms ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 999;
+}
+.pcld-nav__panel.is-open { transform: translateY(0); }
+.pcld-nav__panel-list {
+  display: flex; flex-direction: column; gap: .25rem;
+  padding: .6rem .75rem .9rem;
+}
+.pcld-nav__panel-list a {
+  color: var(--ink);
+  text-decoration: none;
+  padding: .8rem .9rem;
+  border-radius: .55rem;
+  border: 1px solid #1f2a3c;
+  background: #0f1722;
+}
+.pcld-nav__panel-list a.is-active {
+  color: var(--accent);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+/* Prevent body scroll when panel is open */
+html.pcld-no-scroll, body.pcld-no-scroll { overflow: hidden; height: 100%; }
+
+/* --------- Responsive breakpoints --------- */
+@media (max-width: 640px) {
+  /* Make brand a bit smaller so it never wraps */
+  .pcld-nav__brand { font-size: clamp(16px, 4.6vw, 20px); }
+
+  /* Hide inline links on mobile; use the toggle + drawer instead */
+  .pcld-nav__links { display: none; }
+
+  /* Show menu button */
+  .pcld-nav__toggle { display: inline-flex; }
+}
+
+@media (min-width: 641px) {
+  .pcld-nav__toggle { display: none; } /* desktop: hide button */
+  .pcld-nav__panel  { display: none; } /* desktop: no drawer */
+}
+
 </style>
+  <link rel="stylesheet" href="nav-mobile.css?v=7">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
 <body>
 <header>
 <div class="wrap">
 <div class="header-row">
-<img alt="PCLD" class="logo" src="Pirate_Cowboy_Transparent_Circle.png"/>
+<!-- <img alt="PCLD" class="logo" src="Pirate_Cowboy_Transparent_Circle.png"/> -->
 <div>
-<h1>Pirate Cowboy Line Dancing</h1>
+<h1>Dance Catalog</h1>
 <div class="sub">
   Search by Song, Artist, or Dance.<br>
 </div>
@@ -398,5 +551,5 @@
   tryFetchDataJson();
 })();
 </script>
-</body>
+<script src="nav.js?v=4"></script>
 </html>
