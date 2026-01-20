@@ -28,8 +28,7 @@
     max-height: calc(100dvh - 56px) !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    /*background: var(--card, #111720) !important;*/
-    background: var(--card, #000000) !important;
+    background: var(--card, #111720) !important;
     border-top: 1px solid #1f2a3c !important;
     z-index: 999 !important;
 
@@ -62,8 +61,7 @@
     word-break: keep-all !important;
     padding: .8rem .9rem !important;
     border-radius: .55rem !important;
-    /*background: #0f1722 !important;*/
-    background: #000000 !important;
+    background: #0f1722 !important;
     border: 1px solid #1f2a3c !important;
     color: var(--ink, #e9f1ff) !important;
     text-decoration: none !important;
